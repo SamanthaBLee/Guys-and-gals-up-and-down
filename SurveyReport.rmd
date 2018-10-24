@@ -1,8 +1,10 @@
 ---
-title: "Choose a Good Title!"
-author: "Put your name here!"
-date: "put the date here"
-output: word_document
+title: "Class Survey"
+author: "Samantha Lee"
+date: "October 8, 2018"
+output:
+  html_document:
+    df_print: paged
 ---
 
 ```{r include=FALSE,echo=FALSE}
@@ -15,7 +17,7 @@ require(tigerstats)
 
 <!--In this section you explain what you are trying to show.  Where did the data come from?  What is the research or other question you are trying to answer?!-->
   
-We start by loading the data into 2 data frames
+We start by loading the data into 2 data frames.
 
 ```{r}
 library(readr)
@@ -26,11 +28,30 @@ Sec23 <- mutate(Sec23,sect="Eve")
 alldat <- bind_rows(Sec02,Sec23)
 ```
 
+```{r}
+write.csv(x=alldat,file="alldat.csv")
+```
+
+
+
+
+#Questions to Answer
+### 1)Is there a difference in average age between the two classes.
+### 2)Is there a difference in breathold times between the guys and gals.
+### 3)Is there a difference between time going up and down the stairs between guys and gals
+
+
+
+# Question 1
+
 
 
 # Methods
 
 <!--Decide on your methods:  use "variable analysis" or other appropriate descriptors.  Make sure to choose at least one graphical method and at least one numerical method.!-->
+
+
+
 
 #Results
 
@@ -42,15 +63,209 @@ alldat <- bind_rows(Sec02,Sec23)
 
 <!--Graphical results here.  Make sure to show your code.  Provide appropriate labels for axes, giving units if possible, and provide a good title for the graph, too.  Use the graphical results to describe the patterns if any that exist in the data as focused toward the research question!-->
 
+
+Here is a box plot of the ages of the evening and pm class.
+
+```{r}
+Boxplot(Age_yrs~sect, data=alldat, id=list(method="y"))
+```
+
+
+Looking at the graph, there appears to be approximately a 3-5 year age difference between the evening and the pm class; with the evening class having the older students.
+
 ### Numerical Descriptive Results
 
 <!--Numerical results go here. Use the numerical results to describe the patterns if any that exist in the data as focused toward the research question!-->
+
+Here are the numerical summaries of the two classes ages.
+
+```{r}
+numSummary(alldat[,"Age_yrs", drop=FALSE], 
+  groups=alldat$sect, statistics=c("mean", "sd", "IQR", 
+  "quantiles"), quantiles=c(0,.25,.5,.75,1))
+```
+
+
+The Average from the evening class is 24.1 years old, and the average from the pm class is 19.9 years old.
+According to the numerical summary, there is a 4.2 year age difference.
+
 
 ## Inferential Results
 
 <!--State hypothesis clearly.  Make sure your discussion of the inferential test covers all the aspects that the test output produces, such as test statistic, p-value etc.  Make a decision about the null hypothesis, explain the assumptions on which the selected test/procedure was based, and why the chosen procedure satisfys the assumptions and is appropriate to answer the research question!-->
 
 
+We will run a t-test to test this hypothesis.
+
+$H_0$ The average age in the two classes are the same.  
+$H_a$ The average age in the two classes are different.
+
+```{r}
+t.test(Age_yrs~sect, alternative='two.sided', 
+  conf.level=.95, var.equal=FALSE, data=alldat)
+```
+
+
+Interprerting the results, we say that under the conditions that the null hypothesis is true the tests say we would see results like this 9 out of 1000 times.  I choose to reject the null hypothesis based on the low p-value.
+
+
 # Discussion and Conclusion
 
 <!--Discussion and conclusion here.  If you found a relationship be sure to consider whether the relationship occurs because one of the variavbles causes the other, or whether they perhasps are related for some other reason.  Watch the chapter 6 videos from the GeorgeTown videos collection.!-->
+
+Our tests show that the evening class has older students than the pm class.
+
+
+
+
+#Question 2
+
+#Results
+
+<!--Divide this section into two sub-sections:  One for your descriptive  results and one for your inferential results.!-->
+
+## Descriptive Results
+
+### Graphical Descriptive Results
+
+<!--Graphical results here.  Make sure to show your code.  Provide appropriate labels for axes, giving units if possible, and provide a good title for the graph, too.  Use the graphical results to describe the patterns if any that exist in the data as focused toward the research question!-->
+
+First we create a box plot of the two breatholds
+```{r}
+Boxplot(Breathold~Gender, data=alldat, id=list(method="y"), xlab="Gender", 
+  ylab="Breathold", main="Breathold 1")
+```
+
+
+```{r}
+Boxplot(Breathold2~Gender, data=alldat, id=list(method="y"), xlab="Gender", 
+  ylab="Breathold", main="Breathold 2")
+```
+
+### Numerical Descriptive Results
+
+<!--Numerical results go here. Use the numerical results to describe the patterns if any that exist in the data as focused toward the research question!-->
+
+Next we create summaries of the breatholds
+```{r}
+numSummary(alldat[,"Breathold", drop=FALSE], groups=alldat$Gender, 
+  statistics=c("mean", "sd", "IQR", "quantiles"), quantiles=c(0,.25,.5,.75,1))
+```
+
+```{r}
+numSummary(alldat[,"Breathold2", drop=FALSE], groups=alldat$Gender, 
+  statistics=c("mean", "sd", "IQR", "quantiles"), quantiles=c(0,.25,.5,.75,1))
+```
+
+
+
+
+
+## Inferential Results
+
+<!--State hypothesis clearly.  Make sure your discussion of the inferential test covers all the aspects that the test output produces, such as test statistic, p-value etc.  Make a decision about the null hypothesis, explain the assumptions on which the selected test/procedure was based, and why the chosen procedure satisfys the assumptions and is appropriate to answer the research question!-->
+
+We will run a t-test on both breatholds to test the hypothesis
+$H_0$ The breathold speed of the two genders are the same.
+$H_a$ The breathold of the two genders are different.
+
+```{r}
+t.test(Breathold~Gender, alternative='two.sided', 
+  conf.level=.95, var.equal=FALSE, data=alldat)
+```
+
+
+
+```{r}
+t.test(Breathold2~Gender, alternative='two.sided', 
+  conf.level=.95, var.equal=FALSE, data=alldat)
+```
+
+Besed on the low p-values of both tests I choose to reject the null hypothesis.
+
+
+# Discussion and Conclusion
+
+<!--Discussion and conclusion here.  If you found a relationship be sure to consider whether the relationship occurs because one of the variavbles causes the other, or whether they perhasps are related for some other reason.  Watch the chapter 6 videos from the GeorgeTown videos collection.!-->
+
+Based on the evidence, guys had greater breathold times then gals.
+
+
+
+
+
+# Question 3
+
+# Introduction
+
+<!--In this section you explain what you are trying to show.  Where did the data come from?  What is the research or other question you are trying to answer?!-->
+
+# Methods
+
+<!--Decide on your methods:  use "variable analysis" or other appropriate descriptors.  Make sure to choose at least one graphical method and at least one numerical method.!-->
+
+
+Are there differences between time up and down the stairs between guys and gals?
+
+
+#Results
+
+<!--Divide this section into two sub-sections:  One for your descriptive  results and one for your inferential results.!-->
+
+## Descriptive Results
+
+### Graphical Descriptive Results
+
+<!--Graphical results here.  Make sure to show your code.  Provide appropriate labels for axes, giving units if possible, and provide a good title for the graph, too.  Use the graphical results to describe the patterns if any that exist in the data as focused toward the research question!-->
+
+
+Here is a box plot of the times going up and down the stairs of women and men.
+
+```{r}
+Boxplot(time_down_up~Gender, data=alldat, id=list(method="y"))
+```
+
+
+Looking at the graphical evidence, it appears the men went up and down the stairs about 5 seconds faster than the women.
+
+### Numerical Descriptive Results
+
+<!--Numerical results go here. Use the numerical results to describe the patterns if any that exist in the data as focused toward the research question!-->
+
+Here are the numerical summaries of the men and women's times.
+
+```{r}
+numSummary(alldat[,"time_down_up", drop=FALSE], 
+  groups=alldat$Gender, statistics=c("mean", "sd", "IQR", 
+  "quantiles"), quantiles=c(0,.25,.5,.75,1))
+```
+
+
+The Average from the women is 30.6 seconds and the average for men is 24.1 seconds. Men averaged going up and down the staris about 6.5 seconds faster.
+
+
+## Inferential Results
+
+<!--State hypothesis clearly.  Make sure your discussion of the inferential test covers all the aspects that the test output produces, such as test statistic, p-value etc.  Make a decision about the null hypothesis, explain the assumptions on which the selected test/procedure was based, and why the chosen procedure satisfys the assumptions and is appropriate to answer the research question!-->
+
+
+We will run a t-test to test this hypothesis.
+
+$H_0$ The average speed of the two genders are the same.
+$H_a$ The average speed of the two genders are different.
+
+```{r}
+t.test(time_down_up~Gender, alternative='two.sided', 
+  conf.level=.95, var.equal=FALSE, data=alldat)
+```
+
+
+
+
+Interprerting the results, we say that under the conditions that the null hypothesis is true the tests say we would see results like this 1 in 100 times.  I choose to reject the null hypothesis based on the low p-value.
+
+
+# Discussion and Conclusion
+
+<!--Discussion and conclusion here.  If you found a relationship be sure to consider whether the relationship occurs because one of the variavbles causes the other, or whether they perhasps are related for some other reason.  Watch the chapter 6 videos from the GeorgeTown videos collection.!-->
+Our tests show that the men have faster times up and down the stairs than the women.
